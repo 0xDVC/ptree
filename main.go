@@ -56,12 +56,30 @@ func main() {
                 children[p.PPid] = append(children[p.PPid], p)
         }
 
-        for pid, kids := range children {
-                if len(kids) > 0 {
-                        fmt.Printf("parent %d has child(ren):\n", pid)
-                        for _, child := range kids {
-                                fmt.Printf("  └── %d %s\n", child.PID, child.Name)
+        //basic tree traversal
+        //in unix systems, it's a hierchical traversal for the process tree
+        //TODO: implement recursion next to internally walk through
+        type Item struct {
+                PID int
+                Indent string
+        }
+
+        stack:= []Item{{PID:1, Indent:""}}
+        for len(stack) >0 {
+                current := stack[len(stack)-1]
+                stack = stack[:len(stack)-1]
+
+
+                for _,p := range processes{
+                        if p.PID == current.PID {
+                                fmt.Printf("%s%d %d KB %s\n", current.Indent, p.PID, p.RSS, p.Name)
+                                break
                         }
+                }
+
+                kids:= children[current.PID]
+                for _,child:= range kids {
+                        stack = append(stack, Item{PID:child.PID, Indent:current.Indent + " "})
                 }
         }
 }
