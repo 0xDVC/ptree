@@ -1,48 +1,37 @@
-<style>
-    body {
-        padding: 0;
-        margin: 0;
-    }
-    .title {
-        font-size: 24px;
-        display: flex;
-        justify-content: center;
-    }
+# ptree
 
-</style>
+A simple process tree tool that shows memory attribution for processes and their children.
 
-<h1 class='title'>ptree</h1>
-<span>trying to build a simple process memory attribution tool before dawn. lets see how it goes.</span>
 
-<h3>progress</h3>
-**should be changing as i proceed
-<pre>
-PID    RSS(KB)  CMD
-1      128      init
-├── 276    140      syslogd
-├── 304    148      crond
-├── 403    116      udhcpc
-├── 467    124      getty
-└── 59     9936     orbstack-agent:
-    └── 479    1136     sh
-        └── 3733   19788    go
-            └── 3821   2436     main
-</pre>
+## how to run
 
-<h3>testing</h3>
-<em>disclaimer:</em> i am running this on my homelab(alpine 3.22, arm64 on orbstack vm). this should work on any linux distro.
+```bash
+go run main.go
+```
+or you could:
 
-<h3>requirements</h3>
-<ul>
-<li>any linux distro</li>
-<li>>=go1.21</li>
-</ul>
+```bash
+go build
+./ptree
+```
 
-<h3>resource</h3>
-<ul>
-    <li>
-        <a href="https://broman.dev/download/The%20Linux%20Programming%20Interface.pdf">The Linux Programming book, Michael Kerrisk</a>
-    </li>
-</ul>
+## sample output
 
-<em>ET: 1h 33m</em>
+```
+PID    RSS(KB)    TOTAL(KB)  CMD
+1      128        2048       init
+├── 276    140        140        syslogd
+├── 304    148        148        crond
+└── 59     9936       2048       orbstack-agent
+    └── 479    1136       1136        sh
+        └── 3733   19788      19788       go
+```
+
+## requirements
+
+- linux (uses `/proc` filesystem)
+- go 1.21+
+
+## Testing
+
+tested on alpine 3.22 (arm64) via orbstack vm. should work on any linux distro.
