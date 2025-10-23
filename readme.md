@@ -17,20 +17,16 @@
 <h3>progress</h3>
 **should be changing as i proceed
 <pre>
-parent 0 has child(ren):
-  └── 1 init
-parent 479 has child(ren):
-  └── 2741 go
-parent 1 has child(ren):
-  └── 276 syslogd
-  └── 304 crond
-  └── 403 udhcpc
-  └── 467 getty
-  └── 59 orbstack-agent:
-parent 2741 has child(ren):
-  └── 2845 main
-parent 59 has child(ren):
-  └── 479 sh
+PID    RSS(KB)  CMD
+1      128      init
+├── 276    140      syslogd
+├── 304    148      crond
+├── 403    116      udhcpc
+├── 467    124      getty
+└── 59     9936     orbstack-agent:
+    └── 479    1136     sh
+        └── 3733   19788    go
+            └── 3821   2436     main
 </pre>
 
 <h3>testing</h3>
