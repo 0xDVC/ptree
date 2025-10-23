@@ -17,15 +17,20 @@
 <h3>progress</h3>
 **should be changing as i proceed
 <pre>
-pid:  1, ppid: 0, rss: 184 KB, name: init
-pid:  1900, ppid: 479, rss: 21136 KB, name: go
-pid:  1989, ppid: 1900, rss: 2392 KB, name: main
-pid:  276, ppid: 1, rss: 212 KB, name: syslogd
-pid:  304, ppid: 1, rss: 228 KB, name: crond
-pid:  403, ppid: 1, rss: 168 KB, name: udhcpc
-pid:  467, ppid: 1, rss: 180 KB, name: getty
-pid:  479, ppid: 59, rss: 896 KB, name: sh
-pid:  59, ppid: 1, rss: 10144 KB, name: orbstack-agent:
+parent 0 has child(ren):
+  └── 1 init
+parent 479 has child(ren):
+  └── 2741 go
+parent 1 has child(ren):
+  └── 276 syslogd
+  └── 304 crond
+  └── 403 udhcpc
+  └── 467 getty
+  └── 59 orbstack-agent:
+parent 2741 has child(ren):
+  └── 2845 main
+parent 59 has child(ren):
+  └── 479 sh
 </pre>
 
 <h3>testing</h3>
@@ -44,4 +49,4 @@ pid:  59, ppid: 1, rss: 10144 KB, name: orbstack-agent:
     </li>
 </ul>
 
-<em>ET: 30m</em>
+<em>ET: 58m</em>
