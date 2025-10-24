@@ -21,18 +21,15 @@ type StackNode struct {
 }
 
 // calculate total memory including children recursively
-func calculateMemoryTotal(pid int, processes []Process, children map[int][]Process, totals map[int]int) int {
-	var rss int
-	for _, proc := range processes {
-		if proc.PID == pid {
-			rss = proc.RSS
-			break
-		}
+func calculateMemoryTotal(pid int, procMap map[int]Process, children map[int][]Process, totals map[int]int) int {
+	proc, ok := procMap[pid]
+	if !ok {
+		return 0
 	}
 
-	total := rss
+	total := proc.RSS
 	for _, child := range children[pid] {
-		total += calculateMemoryTotal(child.PID, processes, children, totals)
+		total += calculateMemoryTotal(child.PID, procMap, children, totals)
 	}
 
 	totals[pid] = total
@@ -40,7 +37,12 @@ func calculateMemoryTotal(pid int, processes []Process, children map[int][]Proce
 }
 
 func main() {
-	entries, _ := os.ReadDir("/proc")
+	entries, err := os.ReadDir("/proc")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to read /proc: %v\n", err)
+		os.Exit(1)
+	}
+
 	processes := []Process{}
 
 	for _, entry := range entries {
@@ -61,13 +63,28 @@ func main() {
 
 		for _, line := range lines {
 			if strings.HasPrefix(line, "PPid:") {
-				ppid, _ = strconv.Atoi(strings.Fields(line)[1])
+				fields := strings.Fields(line)
+				if len(fields) >= 2 {
+					val, err := strconv.Atoi(fields[1])
+					if err == nil {
+						ppid = val
+					}
+				}
 			}
 			if strings.HasPrefix(line, "VmRSS:") {
-				rss, _ = strconv.Atoi(strings.Fields(line)[1])
+				fields := strings.Fields(line)
+				if len(fields) >= 2 {
+					val, err := strconv.Atoi(fields[1])
+					if err == nil {
+						rss = val
+					}
+				}
 			}
 			if strings.HasPrefix(line, "Name:") {
-				name = strings.Fields(line)[1]
+				fields := strings.Fields(line)
+				if len(fields) >= 2 {
+					name = fields[1]
+				}
 			}
 		}
 
@@ -80,12 +97,19 @@ func main() {
 	}
 
 	totals := make(map[int]int)
-	calculateMemoryTotal(1, processes, children, totals)
 
-	fmt.Printf("%-6s %-8s %-10s %s\n", "PID", "RSS(KB)", "TOTAL(KB)", "CMD")
+	// create a map of processes for quick lookup
+	procMap := make(map[int]Process)
+	for _, proc := range processes {
+		procMap[proc.PID] = proc
+	}
+
+	calculateMemoryTotal(1, procMap, children, totals)
+
+	fmt.Printf("%-10s %-8s %-10s %s\n", "PID", "RSS(KB)", "TOTAL(KB)", "CMD")
 
 	// stack-based tree traversal to print in correct order
-	stack := []StackNode{{pid:1, prefix:"", indent:""}}
+	stack := []StackNode{{pid: 1, prefix: "", indent: ""}}
 
 	for len(stack) > 0 {
 		node := stack[len(stack)-1]
@@ -93,7 +117,7 @@ func main() {
 
 		for _, proc := range processes {
 			if proc.PID == node.pid {
-				fmt.Printf("%s%-6d %-8d %-10d %s\n", node.prefix, proc.PID, proc.RSS, totals[proc.PID], proc.Name)
+				fmt.Printf("%s%-10d %-8d %-10d %s\n", node.prefix, proc.PID, proc.RSS, totals[proc.PID], proc.Name)
 				break
 			}
 		}

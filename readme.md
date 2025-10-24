@@ -18,13 +18,16 @@ go build
 ## sample output
 
 ```
-PID    RSS(KB)    TOTAL(KB)  CMD
-1      128        2048       init
-├── 276    140        140        syslogd
-├── 304    148        148        crond
-└── 59     9936       2048       orbstack-agent
-    └── 479    1136       1136        sh
-        └── 3733   19788      19788       go
+PID    RSS(KB)  TOTAL(KB)  CMD
+1      128      33752      init
+├── 276    140      140        syslogd
+├── 304    152      152        crond
+├── 403    116      116        udhcpc
+├── 467    124      124        getty
+└── 59     10040    33092      orbstack-agent:
+    └── 3944   1144     23052      sh
+        └── 5322   19416    21908      go
+            └── 5430   2492     2492       main
 ```
 
 ## requirements
