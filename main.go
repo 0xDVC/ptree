@@ -115,11 +115,9 @@ func main() {
 		node := stack[len(stack)-1]
 		stack = stack[:len(stack)-1]
 
-		for _, proc := range processes {
-			if proc.PID == node.pid {
-				fmt.Printf("%s%-10d %-8d %-10d %s\n", node.prefix, proc.PID, proc.RSS, totals[proc.PID], proc.Name)
-				break
-			}
+		proc, ok := procMap[node.pid]
+		if ok {
+			fmt.Printf("%s%-10d %-8d %-10d %s\n", node.prefix, proc.PID, proc.RSS, totals[proc.PID], proc.Name)
 		}
 
 		// add children to stack in reverse order
